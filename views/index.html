@@ -55,9 +55,12 @@
                     throw new Error('Network response was not ok');
                 }
 
+                const lastIndex = this.messages.push({ text: '', isUser: false });
+                
+                console.log(this.messages);
+
                 // Handle streaming response
                 const reader = response.body.getReader();
-                let botResponse = '';
                 
                 while (true) {
                     const {value, done} = await reader.read();
@@ -68,13 +71,13 @@
                     
                     for (const line of lines) {
                         if (line.startsWith('data: ')) {
-                            botResponse += line.slice(6);
+                            this.messages[lastIndex - 1].text += line.slice(6);
                         }
                     }
                 }
                 
                 // Add bot response to chat
-                this.messages.push({ text: botResponse, isUser: false });
+                
             } catch (error) {
                 console.error('Error:', error);
                 this.messages.push({ 
